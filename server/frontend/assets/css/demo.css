@@ -57,8 +57,3 @@
     opacity: 1;
     color: #FFFFFF;
 }
-
-.table-upgrade td:nth-child(2),
-.table-upgrade td:nth-child(3){
-    text-align: center;
-}
