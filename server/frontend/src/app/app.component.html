@@ -1,0 +1,50 @@
+<md-toolbar color="primary">
+  <span>SyncMe</span>
+</md-toolbar>
+
+<md-card class="card">
+  <md-card-header>
+    <md-card-title class="card-title">People</md-card-title>
+    <md-card-subtitle>Updated 5 minutes ago</md-card-subtitle>
+  </md-card-header>
+
+  <md-card-content>
+      <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contact of user.contactsArray">
+          <td>{{contact.name}}</td>
+          <td>{{contact.surname}}</td>
+          <td>{{contact.email}}</td>
+          <td>{{contact.phone}}</td>
+        </tr>
+      </tbody>
+      </table>
+  </md-card-content>
+  <md-card-actions>
+    <div class="input-group"  style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px;">
+      <input type="text" class="form-control" placeholder="Text to send...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" (click)="clicked()">SEND!</button>
+      </span>
+    </div>
+  </md-card-actions>
+</md-card>
+
+<md-card class="card">
+  <md-card-header>
+    <md-card-title class="card-title">Location</md-card-title>
+    <md-card-subtitle>Updated 1 minutes ago</md-card-subtitle>
+  </md-card-header>
+
+  <md-card-content>
+      <div style="height: 180px" id="map"></div>
+  </md-card-content>
+</md-card>
