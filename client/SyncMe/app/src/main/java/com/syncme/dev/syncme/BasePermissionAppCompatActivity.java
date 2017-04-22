@@ -57,5 +57,4 @@ public class BasePermissionAppCompatActivity extends AppCompatActivity {
 
         void permissionGranted();
     }
-
 }

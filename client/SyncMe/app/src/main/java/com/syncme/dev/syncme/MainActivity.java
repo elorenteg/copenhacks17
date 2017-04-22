@@ -1,38 +1,23 @@
 package com.syncme.dev.syncme;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
+import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Calendar;
-import java.util.Locale;
+import com.syncme.dev.syncme.controllers.LocationController;
+import com.syncme.dev.syncme.controllers.SMSController;
 
 public class MainActivity extends BasePermissionAppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
-    private static final String TWILIO_NUM = "629412318";
-    private static final String TWILIO_KEY = "Twilio";
-    final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    public static final String INBOX = "content://sms/inbox";
+        implements NavigationView.OnNavigationItemSelectedListener, LocationController.OnNewLocationCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +25,6 @@ public class MainActivity extends BasePermissionAppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -60,9 +36,14 @@ public class MainActivity extends BasePermissionAppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         configurePermissions();
+
+        //Check first item
+        navigationView.getMenu().getItem(0).setChecked(true);
+        onNavigationItemSelected(navigationView.getMenu().getItem(0));
     }
 
     private void configurePermissions() {
+        final LocationController.OnNewLocationCallback onNewLocationCallback = this;
         getPermissions(new RequestPermissionAction() {
             @Override
             public void permissionDenied() {
@@ -74,7 +55,9 @@ public class MainActivity extends BasePermissionAppCompatActivity
             public void permissionGranted() {
                 // Call Back, when permission is Granted
                 Log.e("MA", "Permission Granted");
-                readMessages();
+
+                SMSController.getInstance(getBaseContext()).readMessages();
+                LocationController.getInstance(getBaseContext()).startLocation(onNewLocationCallback);
             }
         });
     }
@@ -117,18 +100,16 @@ public class MainActivity extends BasePermissionAppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        Fragment fragment = null;
+        if (id == R.id.nav_home) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            fragment = MainFragment.newInstance();
+        }
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, fragment);
+            ft.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -136,40 +117,9 @@ public class MainActivity extends BasePermissionAppCompatActivity
         return true;
     }
 
-    private void readMessages() {
-        Cursor cursor = getContentResolver().query(Uri.parse(INBOX), null, null, null, null);
-        if (cursor.moveToFirst()) { // must check the result to prevent exception
-            do {
-                int indAddr = cursor.getColumnIndex("address");
-                int indBody = cursor.getColumnIndex("body");
-                int indDate = cursor.getColumnIndex("date");
-                int indDateSent = cursor.getColumnIndex("date_sent");
-                if (cursor.getString(indBody).indexOf(TWILIO_KEY) >= 0) {
-                    String msgData = cursor.getColumnName(indAddr) + ": " + cursor.getString(indAddr) + "\n" +
-                            cursor.getColumnName(indDateSent) + ": " + getDate(cursor.getString(indDateSent)) + "\n" +
-                            cursor.getColumnName(indDate) + ": " + getDate(cursor.getString(indDate)) + "\n" +
-                            cursor.getColumnName(indBody) + ": " + cursor.getString(indBody);
-                    Log.e("MA", msgData);
-                }
-            } while (cursor.moveToNext());
+    @Override
+    public void onNewLocation(Location location) {
 
-            openFragment();
-        } else {
-            // empty box, no SMS
-        }
-    }
-
-    private String getDate(String time) {
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(Long.valueOf(time));
-        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
-        return date;
-    }
-
-    public void openFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, MainFragment.newInstance());
-        ft.commit();
     }
 }
 
