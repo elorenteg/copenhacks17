@@ -20,11 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 public class SMSController {
     public static final String INBOX = "content://sms/inbox";
-    private static final String TWILIO_NUM = "629412318";
-    private static final String TWILIO_KEY = "HolaPepito";
+    private static final String TWILIO_KEY = "Twilio";
     private static Context mContext;
     private static SMSController instance;
     private OnReadMessagesCallback onReadMessagesCallback;
+
+    private static final String USERID_KEY = "userID";
+    private static int USERID_LENGTH = 4;
 
     private SMSController(Context context) {
         mContext = context;
@@ -99,6 +101,7 @@ public class SMSController {
 
         final Bundle bundle = intent.getExtras();
         boolean isEventMessage = false;
+        String userID = "";
 
         try {
             if (bundle != null) {
@@ -114,17 +117,21 @@ public class SMSController {
                     //Toast.makeText(mContext, "senderNum: "+ senderNum + ", message: " + message,
                     //        Toast.LENGTH_LONG).show();
 
-                    if (message.indexOf(TWILIO_KEY) >= 0) isEventMessage = true;
+                    if (message.indexOf(TWILIO_KEY) >= 0) {
+                        isEventMessage = true;
+                        int posID = message.indexOf(USERID_KEY) + USERID_KEY.length();
+                        userID = message.substring(posID, posID + USERID_LENGTH);
+                    }
                 }
             }
         } catch (Exception e) {
             Log.e("SmsReceiver", "Exception smsReceiver" +e);
         }
-        onReadMessagesCallback.onReadReceivedMessage(isEventMessage);
+        onReadMessagesCallback.onReadReceivedMessage(isEventMessage, userID);
     }
 
     public interface OnReadMessagesCallback {
         void onReadMessages(boolean hasMessage);
-        void onReadReceivedMessage(boolean isEventMessage);
+        void onReadReceivedMessage(boolean isEventMessage, String userID);
     }
 }
