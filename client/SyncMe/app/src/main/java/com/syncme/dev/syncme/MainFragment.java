@@ -39,10 +39,6 @@ public class MainFragment extends Fragment {
 
         View myInflatedView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Set the Text to try this out
-        TextView t = (TextView) myInflatedView.findViewById(R.id.text);
-        t.setText("Text to Display");
-
         return myInflatedView;
     }
 }
