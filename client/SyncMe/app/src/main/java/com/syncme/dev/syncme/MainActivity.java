@@ -59,8 +59,6 @@ public class MainActivity extends BasePermissionAppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //openFragment();
-
         configureSMSPermission();
     }
 
@@ -138,12 +136,6 @@ public class MainActivity extends BasePermissionAppCompatActivity
         return true;
     }
 
-    public void openFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, MainFragment.newInstance());
-        ft.commit();
-    }
-
     private void readMessages() {
         Cursor cursor = getContentResolver().query(Uri.parse(INBOX), null, null, null, null);
         if (cursor.moveToFirst()) { // must check the result to prevent exception
@@ -160,6 +152,8 @@ public class MainActivity extends BasePermissionAppCompatActivity
                     Log.e("MA", msgData);
                 }
             } while (cursor.moveToNext());
+
+            openFragment();
         } else {
             // empty box, no SMS
         }
@@ -170,6 +164,12 @@ public class MainActivity extends BasePermissionAppCompatActivity
         cal.setTimeInMillis(Long.valueOf(time));
         String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
         return date;
+    }
+
+    public void openFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, MainFragment.newInstance());
+        ft.commit();
     }
 }
 

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainFragment extends Fragment {
 
@@ -29,15 +30,19 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e("MF","Hello :)");
-
-        /*
-
-        */
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        Log.e("MF","Hello 2 :)");
+
+        View myInflatedView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        // Set the Text to try this out
+        TextView t = (TextView) myInflatedView.findViewById(R.id.text);
+        t.setText("Text to Display");
+
+        return myInflatedView;
     }
 }
