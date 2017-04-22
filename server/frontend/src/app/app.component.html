@@ -9,12 +9,32 @@
   </md-card-header>
 
   <md-card-content>
-      <ul>
-        <li *ngFor="let item of items">{{item}}</li>
-      </ul>
+      <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contact of user.contactsArray">
+          <td>{{contact.name}}</td>
+          <td>{{contact.surname}}</td>
+          <td>{{contact.email}}</td>
+          <td>{{contact.phone}}</td>
+        </tr>
+      </tbody>
+      </table>
   </md-card-content>
   <md-card-actions>
-    <button md-button>UPDATE</button>
+    <div class="input-group"  style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px;">
+      <input type="text" class="form-control" placeholder="Text to send...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" (click)="clicked()">SEND!</button>
+      </span>
+    </div>
   </md-card-actions>
 </md-card>
 
@@ -25,9 +45,6 @@
   </md-card-header>
 
   <md-card-content>
-      <div style="height: 180px" id="map">HOLA</div>
+      <div style="height: 180px" id="map"></div>
   </md-card-content>
-  <md-card-actions>
-    <button md-button>UPDATE</button>
-  </md-card-actions>
 </md-card>
