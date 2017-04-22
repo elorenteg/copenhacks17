@@ -1,8 +1,18 @@
 package com.syncme.dev.syncme;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +23,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity
+import java.util.Calendar;
+import java.util.Locale;
+
+public class MainActivity extends BasePermissionAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String TWILIO_NUM = "629412318";
+    private static final String TWILIO_KEY = "Twilio";
+    final int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    public static final String INBOX = "content://sms/inbox";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +58,27 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //openFragment();
+
+        configureSMSPermission();
+    }
+
+    private void configureSMSPermission() {
+        getReadSMSPermission(new RequestPermissionAction() {
+            @Override
+            public void permissionDenied() {
+                // Call Back, when permission is Denied
+                Log.e("MA", "Denied");
+            }
+
+            @Override
+            public void permissionGranted() {
+                // Call Back, when permission is Granted
+                Log.e("MA", "Granted");
+                readMessages();
+            }
+        });
     }
 
     @Override
@@ -98,4 +137,40 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void openFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, MainFragment.newInstance());
+        ft.commit();
+    }
+
+    private void readMessages() {
+        Cursor cursor = getContentResolver().query(Uri.parse(INBOX), null, null, null, null);
+        if (cursor.moveToFirst()) { // must check the result to prevent exception
+            do {
+                int indAddr = cursor.getColumnIndex("address");
+                int indBody = cursor.getColumnIndex("body");
+                int indDate = cursor.getColumnIndex("date");
+                int indDateSent = cursor.getColumnIndex("date_sent");
+                if (cursor.getString(indBody).indexOf(TWILIO_KEY) >= 0) {
+                    String msgData = cursor.getColumnName(indAddr) + ": " + cursor.getString(indAddr) + "\n" +
+                            cursor.getColumnName(indDateSent) + ": " + getDate(cursor.getString(indDateSent)) + "\n" +
+                            cursor.getColumnName(indDate) + ": " + getDate(cursor.getString(indDate)) + "\n" +
+                            cursor.getColumnName(indBody) + ": " + cursor.getString(indBody);
+                    Log.e("MA", msgData);
+                }
+            } while (cursor.moveToNext());
+        } else {
+            // empty box, no SMS
+        }
+    }
+
+    private String getDate(String time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(Long.valueOf(time));
+        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+        return date;
+    }
 }
+
+
