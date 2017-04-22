@@ -1,37 +1,23 @@
 package com.syncme.dev.syncme;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
+import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.syncme.dev.syncme.controllers.LocationController;
 import com.syncme.dev.syncme.controllers.SMSController;
 
-import java.util.Calendar;
-import java.util.Locale;
-
 public class MainActivity extends BasePermissionAppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LocationController.OnNewLocationCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +25,6 @@ public class MainActivity extends BasePermissionAppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -60,11 +37,13 @@ public class MainActivity extends BasePermissionAppCompatActivity
 
         configurePermissions();
 
-        openFragment();
+        //Check first item
+        navigationView.getMenu().getItem(0).setChecked(true);
+        onNavigationItemSelected(navigationView.getMenu().getItem(0));
     }
 
     private void configurePermissions() {
-        final Context self = this;
+        final LocationController.OnNewLocationCallback onNewLocationCallback = this;
         getPermissions(new RequestPermissionAction() {
             @Override
             public void permissionDenied() {
@@ -77,8 +56,8 @@ public class MainActivity extends BasePermissionAppCompatActivity
                 // Call Back, when permission is Granted
                 Log.e("MA", "Permission Granted");
 
-                SMSController.getInstance(self).readMessages();
-                LocationController.getInstance(self).startLocation();
+                SMSController.getInstance(getBaseContext()).readMessages();
+                LocationController.getInstance(getBaseContext()).startLocation(onNewLocationCallback);
             }
         });
     }
@@ -121,18 +100,16 @@ public class MainActivity extends BasePermissionAppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        Fragment fragment = null;
+        if (id == R.id.nav_home) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            fragment = MainFragment.newInstance();
+        }
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, fragment);
+            ft.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -140,10 +117,9 @@ public class MainActivity extends BasePermissionAppCompatActivity
         return true;
     }
 
-    public void openFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, MainFragment.newInstance());
-        ft.commit();
+    @Override
+    public void onNewLocation(Location location) {
+
     }
 }
 

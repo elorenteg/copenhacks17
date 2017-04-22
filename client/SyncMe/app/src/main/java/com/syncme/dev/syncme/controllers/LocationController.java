@@ -26,7 +26,7 @@ public class LocationController implements LocationListener, GoogleApiClient.Con
     private boolean isLocationInProgress;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private Location lastLocation;
+    private OnNewLocationCallback onNewLocationCallback;
 
     private LocationController(Context context) {
         mContext = context;
@@ -48,8 +48,9 @@ public class LocationController implements LocationListener, GoogleApiClient.Con
         }
     }
 
-    public boolean startLocation() {
+    public boolean startLocation(OnNewLocationCallback callback) {
         if (!isLocationInProgress) {
+            this.onNewLocationCallback = callback;
             try {
                 mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                         .addConnectionCallbacks(this)
@@ -92,15 +93,13 @@ public class LocationController implements LocationListener, GoogleApiClient.Con
         isLocationInProgress = false;
     }
 
-    public Location getLastLocation() {
-        return lastLocation;
-    }
-
     @Override
     public void onLocationChanged(Location location) {
-        Log.e(TAG, "NEW location: " + location.getLatitude() + ", " + location.getLongitude());
-        this.lastLocation = location;
         if (location != null) {
+            Log.e(TAG, "NEW location: " + location.getLatitude() + ", " + location.getLongitude());
+            if (onNewLocationCallback != null) {
+                onNewLocationCallback.onNewLocation(location);
+            }
             stopLocation();
         }
     }
@@ -123,5 +122,9 @@ public class LocationController implements LocationListener, GoogleApiClient.Con
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, "onConnectedFailed");
         Log.e(TAG, connectionResult.getErrorMessage() + " code: " + connectionResult.getErrorCode());
+    }
+
+    public interface OnNewLocationCallback {
+        void onNewLocation(Location location);
     }
 }

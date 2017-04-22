@@ -10,13 +10,11 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class SMSController {
-
-    private static Context mContext;
-    private static SMSController instance;
-
     public static final String INBOX = "content://sms/inbox";
     private static final String TWILIO_NUM = "629412318";
     private static final String TWILIO_KEY = "Twilio";
+    private static Context mContext;
+    private static SMSController instance;
 
     private SMSController(Context context) {
         mContext = context;
