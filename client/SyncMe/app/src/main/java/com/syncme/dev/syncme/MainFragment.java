@@ -13,10 +13,6 @@ import android.widget.TextView;
 
 public class MainFragment extends Fragment {
 
-    public static final String INBOX = "content://sms/inbox";
-    public static final String SENT = "content://sms/sent";
-    public static final String DRAFT = "content://sms/draft";
-
     public MainFragment() {
         // Required empty public constructor
     }

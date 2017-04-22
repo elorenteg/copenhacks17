@@ -59,21 +59,21 @@ public class MainActivity extends BasePermissionAppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        configureSMSPermission();
+        configurePermissions();
     }
 
-    private void configureSMSPermission() {
-        getReadSMSPermission(new RequestPermissionAction() {
+    private void configurePermissions() {
+        getPermissions(new RequestPermissionAction() {
             @Override
             public void permissionDenied() {
                 // Call Back, when permission is Denied
-                Log.e("MA", "Denied");
+                Log.e("MA", "Permission Denied");
             }
 
             @Override
             public void permissionGranted() {
                 // Call Back, when permission is Granted
-                Log.e("MA", "Granted");
+                Log.e("MA", "Permission Granted");
                 readMessages();
             }
         });
