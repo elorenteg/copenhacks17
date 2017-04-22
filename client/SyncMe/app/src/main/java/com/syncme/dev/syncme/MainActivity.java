@@ -1,6 +1,7 @@
 package com.syncme.dev.syncme;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,17 +25,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.syncme.dev.syncme.controllers.LocationController;
+import com.syncme.dev.syncme.controllers.SMSController;
 
 import java.util.Calendar;
 import java.util.Locale;
 
 public class MainActivity extends BasePermissionAppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    private static final String TWILIO_NUM = "629412318";
-    private static final String TWILIO_KEY = "Twilio";
-    final int REQUEST_CODE_ASK_PERMISSIONS = 123;
-    public static final String INBOX = "content://sms/inbox";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +60,11 @@ public class MainActivity extends BasePermissionAppCompatActivity
 
         configurePermissions();
 
-        LocationController.getInstance(this).startLocation();
+        openFragment();
     }
 
     private void configurePermissions() {
+        final Context self = this;
         getPermissions(new RequestPermissionAction() {
             @Override
             public void permissionDenied() {
@@ -78,7 +76,9 @@ public class MainActivity extends BasePermissionAppCompatActivity
             public void permissionGranted() {
                 // Call Back, when permission is Granted
                 Log.e("MA", "Permission Granted");
-                readMessages();
+
+                SMSController.getInstance(self).readMessages();
+                LocationController.getInstance(self).startLocation();
             }
         });
     }
@@ -138,36 +138,6 @@ public class MainActivity extends BasePermissionAppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void readMessages() {
-        Cursor cursor = getContentResolver().query(Uri.parse(INBOX), null, null, null, null);
-        if (cursor.moveToFirst()) { // must check the result to prevent exception
-            do {
-                int indAddr = cursor.getColumnIndex("address");
-                int indBody = cursor.getColumnIndex("body");
-                int indDate = cursor.getColumnIndex("date");
-                int indDateSent = cursor.getColumnIndex("date_sent");
-                if (cursor.getString(indBody).indexOf(TWILIO_KEY) >= 0) {
-                    String msgData = cursor.getColumnName(indAddr) + ": " + cursor.getString(indAddr) + "\n" +
-                            cursor.getColumnName(indDateSent) + ": " + getDate(cursor.getString(indDateSent)) + "\n" +
-                            cursor.getColumnName(indDate) + ": " + getDate(cursor.getString(indDate)) + "\n" +
-                            cursor.getColumnName(indBody) + ": " + cursor.getString(indBody);
-                    Log.e("MA", msgData);
-                }
-            } while (cursor.moveToNext());
-
-            openFragment();
-        } else {
-            // empty box, no SMS
-        }
-    }
-
-    private String getDate(String time) {
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(Long.valueOf(time));
-        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
-        return date;
     }
 
     public void openFragment() {

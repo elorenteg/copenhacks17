@@ -15,6 +15,8 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.syncme.dev.syncme.controllers.LocationController;
+
 public class SyncBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "SyncBroadcastReceiver";
@@ -36,22 +38,7 @@ public class SyncBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void checkLocation(Context context) {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, false);
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(context, "Wrong permissions", Toast.LENGTH_LONG).show();
-            return;
-        }
-        Location location = locationManager.getLastKnownLocation(bestProvider);
-        Double lat,lon;
-        try {
-            lat = location.getLatitude ();
-            lon = location.getLongitude ();
-            Toast.makeText(context, lat + " " + lon, Toast.LENGTH_LONG).show();
-        }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
+        Location location = LocationController.getInstance(context).getLastLocation();
+        Toast.makeText(context, location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
     }
 }
