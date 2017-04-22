@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 
+import { HTTPService } from './services/HTTPService';
+
 import { AppComponent } from './app.component';
 
 @NgModule({
@@ -18,7 +20,7 @@ import { AppComponent } from './app.component';
     HttpModule,
     MaterialModule.forRoot()
   ],
-  providers: [],
+  providers: [HTTPService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
