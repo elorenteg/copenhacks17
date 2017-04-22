@@ -1,0 +1,14 @@
+server/backend/bin/activate.csh
+server/backend/bin/activate.fish
+server/backend/bin/activate_this.py
+server/backend/bin/easy_install
+server/backend/bin/easy_install-2.7
+server/backend/bin/flask
+server/backend/bin/pip
+server/backend/bin/pip2
+server/backend/bin/pip2.7
+server/backend/bin/pyjwt
+server/backend/bin/python
+server/backend/bin/python-config
+server/backend/bin/python2
+server/backend/bin/wheel
