@@ -9,8 +9,6 @@ import threading
 
 app = Flask(__name__)
 
-now = datetime.now()
-
 client = MongoClient()
 
 # put your own credentials here
@@ -30,15 +28,19 @@ def send_sms(arg):
     '''
 
 
-#db = client.copenhagen
+db = client.copenhagen
 
 
 @app.route('/event', methods=['POST'])
 def save_event():
     data = request.data
+    jsondata = json.loads(data)
+    now = datetime.now()
 
-    run_at = now + timedelta(seconds=10)
+    run_at = datetime.strptime(jsondata['date'], '%Y-%m-%dT%H:%M:%S.%fZ') + timedelta(seconds=10)
+    print run_at
     delay = (run_at - now).total_seconds()
+    print delay
     threading.Timer(delay, send_sms, ["some message"]).start()
     return json.dumps(data)
 
