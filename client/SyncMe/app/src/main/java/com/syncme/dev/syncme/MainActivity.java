@@ -56,7 +56,7 @@ public class MainActivity extends BasePermissionAppCompatActivity
                 // Call Back, when permission is Granted
                 Log.e("MA", "Permission Granted");
 
-                SMSController.getInstance(getBaseContext()).readMessages();
+                //SMSController.getInstance(getBaseContext()).readMessages();
                 LocationController.getInstance(getBaseContext()).startLocation(onNewLocationCallback);
             }
         });
