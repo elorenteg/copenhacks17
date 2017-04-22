@@ -13,10 +13,6 @@ import android.widget.TextView;
 
 public class MainFragment extends Fragment {
 
-    public static final String INBOX = "content://sms/inbox";
-    public static final String SENT = "content://sms/sent";
-    public static final String DRAFT = "content://sms/draft";
-
     public MainFragment() {
         // Required empty public constructor
     }
@@ -38,10 +34,6 @@ public class MainFragment extends Fragment {
         Log.e("MF","Hello 2 :)");
 
         View myInflatedView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        // Set the Text to try this out
-        TextView t = (TextView) myInflatedView.findViewById(R.id.text);
-        t.setText("Text to Display");
 
         return myInflatedView;
     }
