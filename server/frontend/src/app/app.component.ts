@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import 'leaflet';
-import {Contact} from './models/contact';
-import {User} from './models/user';
+import { HTTPService } from './services/HTTPService';
+import { Contact } from './models/contact';
+import { User } from './models/user';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +15,12 @@ export class AppComponent {
   items = ['pepe', 'popo'];
   user = new User();
   contacts = new Array<Contact>();
+  prueba = "SIN VALOR";
 
-  clicked(event){
-    this.user = new User();;
+  constructor(private mHTTPService: HTTPService) {}
+
+  clicked(message: string){
+    this.mHTTPService.sendUpdateRequest(message).subscribe(data => this.prueba = data);
   }
 
   ngOnInit(): void {
