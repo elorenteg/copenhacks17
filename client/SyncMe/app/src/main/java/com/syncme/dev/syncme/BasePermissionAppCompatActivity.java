@@ -10,7 +10,8 @@ public class BasePermissionAppCompatActivity extends AppCompatActivity {
     private final static int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 123;
 
     private String[] permissions = {Manifest.permission.READ_SMS, Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS};
 
     RequestPermissionAction onPermissionCallBack;
 
