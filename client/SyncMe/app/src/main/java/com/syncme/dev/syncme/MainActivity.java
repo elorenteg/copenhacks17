@@ -23,6 +23,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.syncme.dev.syncme.controllers.LocationController;
+
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -60,6 +62,8 @@ public class MainActivity extends BasePermissionAppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         configurePermissions();
+
+        LocationController.getInstance(this).startLocation();
     }
 
     private void configurePermissions() {
