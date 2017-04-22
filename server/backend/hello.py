@@ -1,6 +1,8 @@
 from flask import Flask
+from flask import request
 from twilio.rest import Client
 from pymongo import MongoClient
+import json
 
 app = Flask(__name__)
 client = MongoClient()
@@ -11,20 +13,12 @@ auth_token = "89a0c993ca3901c0ef352b613921a36b"
 mongoclient = MongoClient('localhost', 27017)
 
 db = client.copenhagen
-posts = db.posts
-post_data = {
-    'title': 'Python and MongoDB',
-    'content': 'PyMongo is fun, you guys',
-    'author': 'Scott'
-}
-result = posts.insert_one(post_data)
-print('One post: {0}'.format(result.inserted_id))
 
-
-
-
-@app.route('/')
-def hello_world():
+@app.route('/event', methods=['POST'])
+def save_event():
+    data = request.json
+    print("datais")
+    print(json.dumps(data))
     '''
     client = Client(account_sid, auth_token)
 
