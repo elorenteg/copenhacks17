@@ -10,12 +10,14 @@ auth_token = "89a0c993ca3901c0ef352b613921a36b"
 
 @app.route('/')
 def hello_world():
+    '''
     client = Client(account_sid, auth_token)
 
     client.messages.create(
         to="+34668825668",
         from_="+34960160242",
         body="Hi Ester this is francesc and this is my second SMS to you!!")
+    '''
     return 'Hello World!'
 
 if __name__ == '__main__':
