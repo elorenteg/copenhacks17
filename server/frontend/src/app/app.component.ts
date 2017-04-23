@@ -65,7 +65,7 @@ export class AppComponent {
     contact.id = data._id.$oid;
     contact.name = data.firstname;
     contact.surname = data.lastname;
-    contact.phone = data.phone;
+    contact.phone = data.phonenumber;
     contact.email = data.email;
     contact.latitude = 0;
     contact.longitude = 0;
@@ -81,6 +81,8 @@ export class AppComponent {
       var markers = this.markers;
       setTimeout(function() {
         httpServ.sendRequestAtenders(usID).subscribe(data => {
+          data = data.atenders;
+          console.log(data);
           var coordinates = [];
           for (var i = 0; i < data.length; ++i) {
             if (data[i].latlong !== undefined) {
@@ -88,6 +90,7 @@ export class AppComponent {
               coordinates[coordinates.length] = {lat: latlong[0], lon: latlong[1]};
             }
           }
+          console.log(coordinates);
           drawMarkersFunc(map, markers, coordinates);
         });
       }, 5000);
