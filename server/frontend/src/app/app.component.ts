@@ -20,12 +20,12 @@ export class AppComponent {
   markers = new Array<L.Marker>();
   map: L.Map;
   prueba = "SIN RESPUESTA";
+  userID = "58fbc23ba926e6737f157ec6";
 
   constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {}
 
   clicked(message: string){
-    var userID = "58fbc23ba926e6737f157ec6";
-    this.mHTTPService.sendUpdateRequestSMS(userID, message).subscribe(data =>
+    this.mHTTPService.sendUpdateRequestSMS(this.userID, message).subscribe(data =>
       this.prueba = data);
     this.startObservablDrawingMarkers();
   }
@@ -82,21 +82,37 @@ export class AppComponent {
   }
 
   startObservablDrawingMarkers() {
-      Observable.interval(5000).subscribe(x => {
-        this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
-            this.drawMarkers(data));
-      });
+      var httpServ = this.mHTTPService;
+      var usID = this.userID;
+      var drawMarkersFunc = this.drawMarkers;
+      var map = this.map;
+      var markers = this.markers;
+      setTimeout(function() {
+        httpServ.sendRequestAtenders(usID).subscribe(data => {
+          console.log(data);
+          var coordinates = [];
+          for (var i = 0; i < data.length; ++i) {
+            if (data[i].latlong !== undefined) {
+              var latlong = data[i].latlong.split(',');
+              coordinates[coordinates.length] = {lat: latlong[0], lon: latlong[1]};
+            }
+          }
+          console.log(coordinates);
+          drawMarkersFunc(map, markers, coordinates);
+        });
+      }, 5000);
   }
 
   //TODO Poner con información correcta de servidor
-  drawMarkers(data) {
-    this.prueba = data;
-    for (let marker of this.markers) {
-      this.map.removeLayer(marker);
+  drawMarkers(map, markers, data) {
+    console.log(markers);
+    for (let marker of markers) {
+      map.removeLayer(marker);
     }
-    this.markers.push(L.marker([55.768028, 12.503128]).addTo(this.map));
-    this.markers.push(L.marker([55.772319, 12.508964]).addTo(this.map));
-    this.markers.push(L.marker([55.761173, 12.522551]).addTo(this.map));
+    for (var i = 0; i < data.length; ++i) {
+      markers.push(L.marker([data[i].lat, data[i].lon]).addTo(map));
+    }
+    console.log(markers);
   }
 
   openDialog() {

@@ -7,11 +7,13 @@ export class HTTPService {
   URL_ADD_CONTACT: string;
   URL_UPDATE_LOCATIONS_SMS: string;
   URL_UPDATE_LOCATIONS_LOCATION: string;
+  URL_EVENT_ATENDERS: string;
 
   constructor ( private http: Http ) {
     this.URL_ADD_CONTACT = "";
     this.URL_UPDATE_LOCATIONS_SMS = "http://6c6a0657.ngrok.io";
     this.URL_UPDATE_LOCATIONS_LOCATION = "";
+    this.URL_EVENT_ATENDERS = "http://6c6a0657.ngrok.io";
   }
 
   addContact(contact){
@@ -39,5 +41,13 @@ export class HTTPService {
     return this.http.get(url)
       //.map((res:Response) => res.json());
         .map((res:Response) => "HI");
+  }
+
+  sendRequestAtenders(userID) {
+    var url = this.URL_EVENT_ATENDERS + "/user/" + userID + "/atenders";
+    console.log(url);
+
+    return this.http.get(url)
+        .map((res:Response) => res.json());
   }
 }
