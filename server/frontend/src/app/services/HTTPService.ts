@@ -4,14 +4,21 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class HTTPService {
+  URL_LIST_USERS: string;
   URL_ADD_CONTACT: string;
   URL_UPDATE_LOCATIONS_SMS: string;
   URL_UPDATE_LOCATIONS_LOCATION: string;
 
   constructor ( private http: Http ) {
+    this.URL_LIST_USERS = "http://6c6a0657.ngrok.io/user/";
     this.URL_ADD_CONTACT = "";
     this.URL_UPDATE_LOCATIONS_SMS = "";
     this.URL_UPDATE_LOCATIONS_LOCATION = "";
+  }
+
+  listUser(userID){
+    return this.http.get(this.URL_LIST_USERS + userID)
+      .map((res:Response) => res.json());
   }
 
   addContact(contact){

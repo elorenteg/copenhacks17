@@ -13,19 +13,18 @@ import { User } from './models/user';
 })
 
 export class AppComponent {
-  title = 'app works!';
-  items = ['pepe', 'popo'];
+  USER_ID: string;
   user = new User();
-  contacts = new Array<Contact>();
   markers = new Array<L.Marker>();
   map: L.Map;
-  prueba = "SIN RESPUESTA";
 
-  constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {}
+  constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {
+    this.USER_ID = "58fc28d4a926e67e47ebd7b1";
+  }
 
   clicked(message: string){
     this.mHTTPService.sendUpdateRequestSMS(message).subscribe(data =>
-        this.prueba = data);
+        "");
     this.startObservablDrawingMarkers();
   }
 
@@ -39,45 +38,33 @@ export class AppComponent {
       maxZoom: 19
     }).addTo(this.map);
 
-    this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
-        this.loadContacts(data));
-
-    var contact1 = new Contact();
-    contact1.id = 0;
-    contact1.name = "Marc";
-    contact1.surname = "Vila";
-    contact1.phone = "(+34) 689 754 378";
-    contact1.email = "marcvilagomez@gmail.com";
-    contact1.latitude = 55.768028;
-    contact1.longitude = 12.503128;
-
-    var contact2 = new Contact();
-    contact2.id = 1;
-    contact2.name = "Ester";
-    contact2.surname = "Lorente";
-    contact2.phone = "(+34) 657 654 356";
-    contact2.email = "esterlorente@gmail.com";
-    contact2.latitude = 55.772319;
-    contact2.longitude = 12.508964;
-
-    var contact3 = new Contact();
-    contact3.id = 0;
-    contact3.name = "Francesc de Puig";
-    contact3.surname = "Guixé";
-    contact3.phone = "(+34) 657 865 435";
-    contact3.email = "francescdepuig@gmail.com";
-    contact3.latitude = 55.761173;
-    contact3.longitude = 12.522551;
-
-    this.contacts.push(contact1);
-    this.contacts.push(contact2);
-    this.contacts.push(contact3);
-
-    this.user.contactsArray = this.contacts;
+    this.mHTTPService.listUser(this.USER_ID).subscribe(data =>
+        this.loadUser(data));
   }
 
-  loadContacts(data){
+  loadUser(data){
+      this.user = new User();
+      this.user.contactsArray = new Array<Contact>();
+      this.user.id = data._id.$oid;
 
+      var atenders = data.atenders;
+      for (let atender of atenders) {
+        this.mHTTPService.listUser(atender.$oid).subscribe(data =>
+            this.loadContact(data));
+      }
+  }
+
+  loadContact(data){
+    var contact = new Contact();
+    contact.id = data._id.$oid;
+    contact.name = data.firstname;
+    contact.surname = data.lastname;
+    contact.phone = data.phone;
+    contact.email = data.email;
+    contact.latitude = 0;
+    contact.longitude = 0;
+
+    this.user.contactsArray.push(contact);
   }
 
   startObservablDrawingMarkers() {
@@ -89,7 +76,6 @@ export class AppComponent {
 
   //TODO Poner con información correcta de servidor
   drawMarkers(data) {
-    this.prueba = data;
     for (let marker of this.markers) {
       this.map.removeLayer(marker);
     }
@@ -103,9 +89,7 @@ export class AppComponent {
     dialogRef.afterClosed().subscribe(result => {
       var result = result.split("#");
 
-      console.log(result.length);
       if (result.length == 4) {
-        console.log('dddd');
         var name = result[0];
         var surname = result[1];
         var email = result[2];
