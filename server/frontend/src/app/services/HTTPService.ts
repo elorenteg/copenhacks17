@@ -10,7 +10,7 @@ export class HTTPService {
 
   constructor ( private http: Http ) {
     this.URL_ADD_CONTACT = "";
-    this.URL_UPDATE_LOCATIONS_SMS = "";
+    this.URL_UPDATE_LOCATIONS_SMS = "http://6c6a0657.ngrok.io";
     this.URL_UPDATE_LOCATIONS_LOCATION = "";
   }
 
@@ -22,12 +22,15 @@ export class HTTPService {
         .map((res:Response) => "HI");
   }
 
-  sendUpdateRequestSMS(message) {
-    var url = this.URL_UPDATE_LOCATIONS_SMS + message;
+  sendUpdateRequestSMS(userID, message) {
+    var url = this.URL_UPDATE_LOCATIONS_SMS + "/user/" + userID + "/send";
+    console.log(url);
 
-    return this.http.get(url)
+    var body = {"message": message};
+
+    return this.http.post(url, body)
       //.map((res:Response) => res.json());
-        .map((res:Response) => "HI");
+      .map((res:Response) => "HI");
   }
 
   sendUpdateRequestLocation() {

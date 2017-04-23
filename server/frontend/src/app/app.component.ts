@@ -24,8 +24,9 @@ export class AppComponent {
   constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {}
 
   clicked(message: string){
-    this.mHTTPService.sendUpdateRequestSMS(message).subscribe(data =>
-        this.prueba = data);
+    var userID = "58fbc23ba926e6737f157ec6";
+    this.mHTTPService.sendUpdateRequestSMS(userID, message).subscribe(data =>
+      this.prueba = data);
     this.startObservablDrawingMarkers();
   }
 
