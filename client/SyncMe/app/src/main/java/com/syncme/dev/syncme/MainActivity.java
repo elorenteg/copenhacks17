@@ -14,7 +14,9 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.syncme.dev.syncme.controllers.HttpController;
 import com.syncme.dev.syncme.controllers.LocationController;
 import com.syncme.dev.syncme.controllers.SMSController;
 

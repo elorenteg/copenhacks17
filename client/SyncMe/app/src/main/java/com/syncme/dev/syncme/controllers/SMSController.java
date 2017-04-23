@@ -20,13 +20,12 @@ import java.util.concurrent.TimeUnit;
 
 public class SMSController {
     public static final String INBOX = "content://sms/inbox";
-    private static final String TWILIO_KEY = "Twilio";
+    private static final String TWILIO_KEY = "SyncMe";
     private static Context mContext;
     private static SMSController instance;
     private OnReadMessagesCallback onReadMessagesCallback;
 
-    private static final String USERID_KEY = "userID";
-    private static int USERID_LENGTH = 4;
+    private static int USERID_LENGTH = 24;
 
     private SMSController(Context context) {
         mContext = context;
@@ -119,7 +118,7 @@ public class SMSController {
 
                     if (message.indexOf(TWILIO_KEY) >= 0) {
                         isEventMessage = true;
-                        int posID = message.indexOf(USERID_KEY) + USERID_KEY.length();
+                        int posID = message.indexOf(TWILIO_KEY) + TWILIO_KEY.length();
                         userID = message.substring(posID, posID + USERID_LENGTH);
                     }
                 }
