@@ -26,6 +26,35 @@ mongoclient = MongoClient('localhost', 27017)
 
 db = client.copenhagen
 
+users = db.users
+main = ObjectId("58fc617ca926e68850ea8427")
+users.delete_many({'_id': {'$ne' : main}})
+'''
+contact1.latitude = 55.768028;
+    contact1.longitude = 12.503128;'''
+user_id2 = users.insert_one({"email": "esterlorente@gmail.com",
+    "firstname": "Ester",
+    "lastname": "Lorente",
+    "phonenumber": "+34668825668",
+    "username": "EsterLorente",
+    "latlong":"55.768028,12.503128"
+  }).inserted_id
+user_id3 = users.insert_one({"email": "francescde@gmail.com",
+    "firstname": "Francesc",
+    "lastname": "De Puig",
+    "phonenumber": "+34647043100",
+    "username": "FrancescQ",
+    "latlong":"55.772319,12.508964"
+  }).inserted_id
+atendersFIRSTlist=[main,user_id2,user_id3]
+
+users.find_and_modify(query={'_id': main},
+                          update={"$set": {'atenders': atendersFIRSTlist}})
+users.find_and_modify(query={'_id': main},
+                          update={"$set": {'phonenumber': "+34668825668"}})
+users.find_and_modify(query={'_id': main},
+                          update={"$set": {'latlong': "55.761173,12.522551"}})
+
 @app.route('/user/<id>/loc/<latlong>', methods=['POST'])
 def save_loc(id, latlong):
     users = db.users
@@ -157,14 +186,13 @@ def send_custom(id):
 @app.route('/user/<id>/atenders', methods=['GET'])
 def get_atender_list(id):
     users = db.users
-    print id
     custos = users.find_one({"_id": ObjectId(id)})
+    print "atenders"
     print custos['atenders']
     atenders = list(users.find({'_id': {'$in':custos['atenders']}}))
-    print atenders
     jsonCusto = atenders
     jsonText = json.dumps(jsonCusto, default=json_util.default)
-    return jsonify(json.loads(jsonText))
+    return jsonify(json.loads("{\"atenders\" : "+jsonText+"}"))
 
 
 if __name__ == '__main__':
