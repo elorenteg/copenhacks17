@@ -84,6 +84,27 @@ export class AppComponent {
     this.markers.push(L.marker([55.761173, 12.522551]).addTo(this.map));
   }
 
+  addGuestToEvent(arrayCurrentGuestsID, newGuestID){
+    var atendersArray = [];
+    for (let currentGuest of arrayCurrentGuestsID) {
+      atendersArray.push({
+          "id": currentGuest.id
+      });
+    }
+
+    atendersArray.push({
+        "id": newGuestID.$oid
+    });
+
+    var dataToSend = {
+    	"date": "2017-04-22T21:53:00.283Z",
+    	"atenders": atendersArray
+    }
+
+    this.mHTTPService.addAtender(this.user.id, dataToSend).subscribe(data =>
+      location.reload());
+  }
+
   openDialog() {
     let dialogRef = this.dialog.open(DialogResult);
     dialogRef.afterClosed().subscribe(result => {
@@ -95,9 +116,17 @@ export class AppComponent {
         var email = result[2];
         var phone = result[3];
 
+        var contact = {
+          "username": name + surname,
+          "firstname": name,
+          "lastname": surname,
+          "email": email,
+          "phone": phone
+        }
+
         //Enviar a backend para crear Contacto y refrescar pagina
-        this.mHTTPService.addContact(null).subscribe(data =>
-            "");
+        this.mHTTPService.addContact(contact).subscribe(data =>
+          this.addGuestToEvent(this.user.contactsArray, data._id));
       }
     });
   }
