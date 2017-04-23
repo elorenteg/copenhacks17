@@ -44,8 +44,9 @@ user_id3 = users.insert_one({"email": "francescde@gmail.com",
     "lastname": "De Puig",
     "phonenumber": "+34647043100",
     "username": "FrancescQ",
-    "latlong":"55.772319,12.508964"
+    "latlong":"55.767830,12.498171"
   }).inserted_id
+
 atendersFIRSTlist=[main,user_id2,user_id3]
 
 users.find_and_modify(query={'_id': main},
