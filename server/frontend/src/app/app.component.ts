@@ -13,19 +13,18 @@ import { User } from './models/user';
 })
 
 export class AppComponent {
-  title = 'app works!';
-  items = ['pepe', 'popo'];
+  USER_ID: string;
   user = new User();
-  contacts = new Array<Contact>();
   markers = new Array<L.Marker>();
   map: L.Map;
   prueba = "SIN RESPUESTA";
 
-  constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {}
+  constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {
+    this.USER_ID = "58fc617ca926e68850ea8427";
+  }
 
   clicked(message: string){
-    var userID = "58fbc23ba926e6737f157ec6";
-    this.mHTTPService.sendUpdateRequestSMS(userID, message).subscribe(data =>
+    this.mHTTPService.sendUpdateRequestSMS(this.USER_ID, message).subscribe(data =>
       this.prueba = data);
     this.startObservablDrawingMarkers();
   }
@@ -40,63 +39,92 @@ export class AppComponent {
       maxZoom: 19
     }).addTo(this.map);
 
-    this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
-        this.loadContacts(data));
-
-    var contact1 = new Contact();
-    contact1.id = 0;
-    contact1.name = "Marc";
-    contact1.surname = "Vila";
-    contact1.phone = "(+34) 689 754 378";
-    contact1.email = "marcvilagomez@gmail.com";
-    contact1.latitude = 55.768028;
-    contact1.longitude = 12.503128;
-
-    var contact2 = new Contact();
-    contact2.id = 1;
-    contact2.name = "Ester";
-    contact2.surname = "Lorente";
-    contact2.phone = "(+34) 657 654 356";
-    contact2.email = "esterlorente@gmail.com";
-    contact2.latitude = 55.772319;
-    contact2.longitude = 12.508964;
-
-    var contact3 = new Contact();
-    contact3.id = 0;
-    contact3.name = "Francesc de Puig";
-    contact3.surname = "Guixé";
-    contact3.phone = "(+34) 657 865 435";
-    contact3.email = "francescdepuig@gmail.com";
-    contact3.latitude = 55.761173;
-    contact3.longitude = 12.522551;
-
-    this.contacts.push(contact1);
-    this.contacts.push(contact2);
-    this.contacts.push(contact3);
-
-    this.user.contactsArray = this.contacts;
+    this.mHTTPService.listUser(this.USER_ID).subscribe(data =>
+        this.loadUser(data));
   }
 
-  loadContacts(data){
+  loadUser(data){
+      this.user = new User();
+      this.user.contactsArray = new Array<Contact>();
+      this.user.id = data._id.$oid;
 
+      var atenders = data.atenders;
+      var count = 0;
+      for (let atender of atenders) {
+        this.mHTTPService.listUser(atender.$oid).subscribe(data => {
+            this.loadContact(data);
+            ++count;
+            if (count === atenders.length) this.startObservablDrawingMarkers();
+        });
+      }
+
+  }
+
+  loadContact(data){
+    var contact = new Contact();
+    contact.id = data._id.$oid;
+    contact.name = data.firstname;
+    contact.surname = data.lastname;
+    contact.phone = data.phonenumber;
+    contact.email = data.email;
+    contact.latitude = 0;
+    contact.longitude = 0;
+
+    this.user.contactsArray.push(contact);
   }
 
   startObservablDrawingMarkers() {
-      Observable.interval(5000).subscribe(x => {
-        this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
-            this.drawMarkers(data));
-      });
+      var httpServ = this.mHTTPService;
+      var usID = this.USER_ID;
+      var drawMarkersFunc = this.drawMarkers;
+      var map = this.map;
+      var markers = this.markers;
+      setTimeout(function() {
+        httpServ.sendRequestAtenders(usID).subscribe(data => {
+          data = data.atenders;
+          console.log(data);
+          var coordinates = [];
+          for (var i = 0; i < data.length; ++i) {
+            if (data[i].latlong !== undefined) {
+              var latlong = data[i].latlong.split(',');
+              coordinates[coordinates.length] = {lat: latlong[0], lon: latlong[1]};
+            }
+          }
+          console.log(coordinates);
+          drawMarkersFunc(map, markers, coordinates);
+        });
+      }, 5000);
   }
 
   //TODO Poner con información correcta de servidor
-  drawMarkers(data) {
-    this.prueba = data;
-    for (let marker of this.markers) {
-      this.map.removeLayer(marker);
+  drawMarkers(map, markers, data) {
+    for (let marker of markers) {
+      map.removeLayer(marker);
     }
-    this.markers.push(L.marker([55.768028, 12.503128]).addTo(this.map));
-    this.markers.push(L.marker([55.772319, 12.508964]).addTo(this.map));
-    this.markers.push(L.marker([55.761173, 12.522551]).addTo(this.map));
+    for (var i = 0; i < data.length; ++i) {
+      markers.push(L.marker([data[i].lat, data[i].lon]).addTo(map));
+    }
+  }
+
+  addGuestToEvent(arrayCurrentGuestsID, newGuestID){
+    var atendersArray = [];
+    for (let currentGuest of arrayCurrentGuestsID) {
+      atendersArray.push({
+          "id": currentGuest.id
+      });
+    }
+
+    atendersArray.push({
+        "id": newGuestID.$oid
+    });
+
+    var dataToSend = {
+    	"date": "2017-04-22T21:53:00.283Z",
+    	"atenders": atendersArray
+    }
+
+    this.mHTTPService.addAtender(this.user.id, dataToSend).subscribe(data =>
+      location.reload());
   }
 
   openDialog() {
@@ -104,17 +132,23 @@ export class AppComponent {
     dialogRef.afterClosed().subscribe(result => {
       var result = result.split("#");
 
-      console.log(result.length);
       if (result.length == 4) {
-        console.log('dddd');
         var name = result[0];
         var surname = result[1];
         var email = result[2];
         var phone = result[3];
 
+        var contact = {
+          "username": name + surname,
+          "firstname": name,
+          "lastname": surname,
+          "email": email,
+          "phone": phone
+        }
+
         //Enviar a backend para crear Contacto y refrescar pagina
-        this.mHTTPService.addContact(null).subscribe(data =>
-            "");
+        this.mHTTPService.addContact(contact).subscribe(data =>
+          this.addGuestToEvent(this.user.contactsArray, data._id));
       }
     });
   }

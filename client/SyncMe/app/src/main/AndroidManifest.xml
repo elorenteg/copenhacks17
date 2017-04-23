@@ -31,11 +31,12 @@
             </intent-filter>
         </activity>
 
+
+
         <receiver android:name=".SyncBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"
             android:permission="android.permission.BROADCAST_SMS" >
-            <intent-filter android:priority="2147483647" > <!-- 999 is highest system priority, so it's hack 2147483647 -->
+            <intent-filter android:priority="999" > <!-- 999 is highest system priority, so it's hack 2147483647 -->
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" /> <!-- pre kitkat action -->
                 <action android:name="android.provider.Telephony.SMS_DELIVER" /> <!-- kitkat action -->
             </intent-filter>
