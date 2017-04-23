@@ -26,7 +26,7 @@ public class SMSController {
     private OnReadMessagesCallback onReadMessagesCallback;
 
     private static final String USERID_KEY = "userID";
-    private static int USERID_LENGTH = 4;
+    private static int USERID_LENGTH = 24;
 
     private SMSController(Context context) {
         mContext = context;
