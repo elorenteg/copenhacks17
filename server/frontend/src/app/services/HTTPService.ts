@@ -14,7 +14,7 @@ export class HTTPService {
     this.URL_LIST_USERS = "http://6c6a0657.ngrok.io/user/";
     this.URL_ADD_CONTACT = "http://6c6a0657.ngrok.io/user";
     this.URL_ADD_ATENDERS = "http://6c6a0657.ngrok.io/event/";
-    this.URL_UPDATE_LOCATIONS_SMS = "";
+    this.URL_UPDATE_LOCATIONS_SMS = "http://6c6a0657.ngrok.io";
     this.URL_UPDATE_LOCATIONS_LOCATION = "";
   }
 
@@ -36,12 +36,15 @@ export class HTTPService {
       .map((res:Response) => res.json());
   }
 
-  sendUpdateRequestSMS(message) {
-    var url = this.URL_UPDATE_LOCATIONS_SMS + message;
+  sendUpdateRequestSMS(userID, message) {
+    var url = this.URL_UPDATE_LOCATIONS_SMS + "/user/" + userID + "/send";
+    console.log(url);
 
-    return this.http.get(url)
+    var body = {"message": message};
+
+    return this.http.post(url, body)
       //.map((res:Response) => res.json());
-        .map((res:Response) => "HI");
+      .map((res:Response) => "HI");
   }
 
   sendUpdateRequestLocation() {

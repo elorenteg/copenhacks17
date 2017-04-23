@@ -22,6 +22,7 @@ public class SyncBroadcastReceiver extends BroadcastReceiver implements Location
  SMSController.OnReadMessagesCallback {
 
     private static final String TAG = "SyncBroadcastReceiver";
+    private static final String USERID_LOCATION_URL = "http://6c6a0657.ngrok.io/user/";
     private Context context;
 
     private String userID = "null-user";
@@ -44,15 +45,14 @@ public class SyncBroadcastReceiver extends BroadcastReceiver implements Location
     @Override
     public void onNewLocation(Location location) {
         if (location != null) {
-            Toast.makeText(context, location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
-
-            String url = "";
-            url += "/id/" + userID;
-            url += "/loc/" + location.getLatitude() + ", " + location.getLongitude();
+            String url = USERID_LOCATION_URL;
+            url += userID;
+            url += "/loc/" + location.getLatitude() + "," + location.getLongitude();
 
             Toast.makeText(context, url, Toast.LENGTH_LONG).show();
+            Log.e(TAG, url);
 
-            //HttpController.getInstance(context).executePost(url);
+            HttpController.getInstance(context).executePost(url);
         }
     }
 

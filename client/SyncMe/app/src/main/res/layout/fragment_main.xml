@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Thanks for trust in SyncMe"
+            android:text="Thanks for trusting SyncMe"
             android:textSize="20dp"
             android:textStyle="bold" />
 

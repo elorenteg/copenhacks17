@@ -17,14 +17,16 @@ export class AppComponent {
   user = new User();
   markers = new Array<L.Marker>();
   map: L.Map;
+  prueba : string;
 
   constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {
     this.USER_ID = "58fc28d4a926e67e47ebd7b1";
   }
 
   clicked(message: string){
-    this.mHTTPService.sendUpdateRequestSMS(message).subscribe(data =>
-        "");
+    var userID = "58fbc23ba926e6737f157ec6";
+    this.mHTTPService.sendUpdateRequestSMS(userID, message).subscribe(data =>
+      this.prueba = data);
     this.startObservablDrawingMarkers();
   }
 
