@@ -1,24 +1,30 @@
 import 'hammerjs';
 
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material';
 
-import { AppComponent } from './app.component';
+import { HTTPService } from './services/HTTPService';
+
+import { AppComponent, DialogResult } from './app.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent, DialogResult
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     MaterialModule.forRoot()
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [HTTPService],
+  bootstrap: [AppComponent],
+  entryComponents: [DialogResult]
 })
 export class AppModule { }

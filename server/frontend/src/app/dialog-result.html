@@ -1,0 +1,17 @@
+<h1 md-dialog-title>Add a new contact...</h1>
+
+<div class="input-group"  style="margin-left: 20px; margin-right: 20px; margin-bottom: 20px;">
+  <h4>Name</h4>
+  <input #inputNewName type="text" class="form-control" placeholder="Add a name (e.g: Marc)" style="margin-bottom: 10px">
+  <h4>Surname</h4>
+  <input #inputNewSurname type="text" class="form-control" placeholder="Add a name (e.g: Vila)" style="margin-bottom: 10px">
+  <h4>Email</h4>
+  <input #inputNewEmail type="text" class="form-control" placeholder="Add a name (e.g: marcvila@gmail.com)" style="margin-bottom: 10px">
+  <h4>Phone</h4>
+  <input #inputNewPhone type="text" class="form-control" placeholder="Add a name (e.g: 656763454)" style="margin-bottom: 10px">
+</div>
+
+<div md-dialog-actions>
+  <button md-button (click)="dialogRef.close(inputNewName.value + '#' + inputNewSurname.value + '#' + inputNewEmail.value + '#' + inputNewPhone.value)">Apply</button>
+  <button md-button (click)="dialogRef.close('Option 2')">Cancel</button>
+</div>
