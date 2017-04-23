@@ -20,7 +20,7 @@ export class AppComponent {
   prueba = "SIN RESPUESTA";
 
   constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {
-    this.USER_ID = "58fbc23ba926e6737f157ec6";
+    this.USER_ID = "58fc617ca926e68850ea8427";
   }
 
   clicked(message: string){
@@ -81,7 +81,6 @@ export class AppComponent {
       var markers = this.markers;
       setTimeout(function() {
         httpServ.sendRequestAtenders(usID).subscribe(data => {
-          console.log(data);
           var coordinates = [];
           for (var i = 0; i < data.length; ++i) {
             if (data[i].latlong !== undefined) {
@@ -89,7 +88,6 @@ export class AppComponent {
               coordinates[coordinates.length] = {lat: latlong[0], lon: latlong[1]};
             }
           }
-          console.log(coordinates);
           drawMarkersFunc(map, markers, coordinates);
         });
       }, 5000);
@@ -97,14 +95,12 @@ export class AppComponent {
 
   //TODO Poner con información correcta de servidor
   drawMarkers(map, markers, data) {
-    console.log(markers);
     for (let marker of markers) {
       map.removeLayer(marker);
     }
     for (var i = 0; i < data.length; ++i) {
       markers.push(L.marker([data[i].lat, data[i].lon]).addTo(map));
     }
-    console.log(markers);
   }
 
   addGuestToEvent(arrayCurrentGuestsID, newGuestID){
