@@ -103,14 +103,18 @@ export class AppComponent {
     dialogRef.afterClosed().subscribe(result => {
       var result = result.split("#");
 
-      var name = result[0];
-      var surname = result[1];
-      var email = result[2];
-      var phone = result[3];
+      console.log(result.length);
+      if (result.length == 4) {
+        console.log('dddd');
+        var name = result[0];
+        var surname = result[1];
+        var email = result[2];
+        var phone = result[3];
 
-      //Enviar a backend para crear Contacto y refrescar pagina
-      this.mHTTPService.addContact(null).subscribe(data =>
-          "");
+        //Enviar a backend para crear Contacto y refrescar pagina
+        this.mHTTPService.addContact(null).subscribe(data =>
+            "");
+      }
     });
   }
 }
