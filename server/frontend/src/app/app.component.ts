@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
+import { MdDialog, MdDialogRef } from '@angular/material';
 import 'leaflet';
 import { HTTPService } from './services/HTTPService';
 import { Contact } from './models/contact';
@@ -20,12 +21,12 @@ export class AppComponent {
   map: L.Map;
   prueba = "SIN RESPUESTA";
 
-  constructor(private mHTTPService: HTTPService) {}
+  constructor(private mHTTPService: HTTPService, public dialog: MdDialog) {}
 
   clicked(message: string){
-    this.mHTTPService.sendUpdateRequest(message).subscribe(data =>
+    this.mHTTPService.sendUpdateRequestSMS(message).subscribe(data =>
         this.prueba = data);
-        this.startObservableDrawingMarkers();
+    this.startObservablDrawingMarkers();
   }
 
   ngOnInit(): void {
@@ -37,6 +38,9 @@ export class AppComponent {
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(this.map);
+
+    this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
+        this.loadContacts(data));
 
     var contact1 = new Contact();
     contact1.id = 0;
@@ -72,13 +76,49 @@ export class AppComponent {
     this.user.contactsArray = this.contacts;
   }
 
-  startObservableDrawingMarkers() {
-    //TODO Poner con información correcta de servidor
-      for (let marker of this.markers) {
-        this.map.removeLayer(marker);
-      }
-      this.markers.push(L.marker([55.768028, 12.503128]).addTo(this.map));
-      this.markers.push(L.marker([55.772319, 12.508964]).addTo(this.map));
-      this.markers.push(L.marker([55.761173, 12.522551]).addTo(this.map));
+  loadContacts(data){
+
   }
+
+  startObservablDrawingMarkers() {
+      Observable.interval(5000).subscribe(x => {
+        this.mHTTPService.sendUpdateRequestLocation().subscribe(data =>
+            this.drawMarkers(data));
+      });
+  }
+
+  //TODO Poner con información correcta de servidor
+  drawMarkers(data) {
+    this.prueba = data;
+    for (let marker of this.markers) {
+      this.map.removeLayer(marker);
+    }
+    this.markers.push(L.marker([55.768028, 12.503128]).addTo(this.map));
+    this.markers.push(L.marker([55.772319, 12.508964]).addTo(this.map));
+    this.markers.push(L.marker([55.761173, 12.522551]).addTo(this.map));
+  }
+
+  openDialog() {
+    let dialogRef = this.dialog.open(DialogResult);
+    dialogRef.afterClosed().subscribe(result => {
+      var result = result.split("#");
+
+      var name = result[0];
+      var surname = result[1];
+      var email = result[2];
+      var phone = result[3];
+
+      //Enviar a backend para crear Contacto y refrescar pagina
+      this.mHTTPService.addContact(null).subscribe(data =>
+          "");
+    });
+  }
+}
+
+@Component({
+  selector: 'dialog-result',
+  templateUrl: './dialog-result.html',
+})
+export class DialogResult {
+  constructor(public dialogRef: MdDialogRef<DialogResult>) {}
 }
